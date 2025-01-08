@@ -24,6 +24,9 @@ class HotkeyManager:
         self.keyboard_listener.start()
         self.mouse_listener.start()
 
+        self.mouse_listener.join()
+        self.keyboard_listener.join()
+
     def stop_listening(self):
         if self.keyboard_listener: self.keyboard_listener.stop()
         if self.mouse_listener: self.mouse_listener.stop()

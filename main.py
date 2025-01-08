@@ -2,19 +2,19 @@ from pywinauto import Application
 
 from core.hotkey_manager import HotkeyManager
 from modules.terrain_edit_tool import TerrainEditModule
+from modules.vegetation_edit_tool import VegetationEditModule
 
-if __name__ == "__main__":
+
+def main():
     m = HotkeyManager()
 
     a = Application().connect(title_re=".*REDkit.*")
 
-    terrain_edit_tool = TerrainEditModule(a, m)
-    vegetation_edit_tool = TerrainEditModule(a, m)
+    TerrainEditModule(a, m)
+    VegetationEditModule(a, m)
 
     m.start_listening()
 
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        m.stop_listening()
+
+if __name__ == "__main__":
+    main()
