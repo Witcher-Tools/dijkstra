@@ -24,5 +24,6 @@ class VegetationEditModule:
             hotkey_manager.register_hotkey([str(i)], lambda x=i: self.handle_preset(x))
 
     def handle_preset(self, idx):
+        print(f"Vegetation preset {idx}")
         if 0 <= idx < len(self.buttons):
-            self.buttons[idx].click()
+            self.buttons[idx-1].click()
