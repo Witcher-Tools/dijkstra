@@ -6,12 +6,14 @@ class TerrainEditModule:
             self.scale_button = window.child_window(class_name="msctls_updown32", found_index=0)
             self.slope_button = window.child_window(class_name="msctls_updown32", found_index=1)
 
-            self.brush_preset1 = window.child_window(title="1", class_name="Button")
-            self.brush_preset2 = window.child_window(title="2", class_name="Button")
-            self.brush_preset3 = window.child_window(title="3", class_name="Button")
-            self.brush_preset4 = window.child_window(title="4", class_name="Button")
-            self.brush_preset5 = window.child_window(title="5", class_name="Button")
-            self.brush_preset6 = window.child_window(title="6", class_name="Button")
+            self.preset_buttons = [
+                window.child_window(title="1", class_name="Button"),
+                window.child_window(title="2", class_name="Button"),
+                window.child_window(title="3", class_name="Button"),
+                window.child_window(title="4", class_name="Button"),
+                window.child_window(title="5", class_name="Button"),
+                window.child_window(title="6", class_name="Button")
+            ]
 
             self.probability_bar = window.child_window(class_name="msctls_trackbar32", found_index=8)
         except Exception as e:
@@ -20,20 +22,27 @@ class TerrainEditModule:
         self.register_hotkeys(hotkey_manager)
 
     def register_hotkeys(self, hotkey_manager):
-        hotkey_manager.register_hotkey(['f1'], self.handle_brush_preset)
+        hotkey_manager.register_hotkey(['f1'], lambda: self.handle_brush_preset(1))
+        hotkey_manager.register_hotkey(['f2'], lambda: self.handle_brush_preset(2))
+        hotkey_manager.register_hotkey(['f3'], lambda: self.handle_brush_preset(3))
+        hotkey_manager.register_hotkey(['f4'], lambda: self.handle_brush_preset(4))
+        hotkey_manager.register_hotkey(['f5'], lambda: self.handle_brush_preset(5))
+        hotkey_manager.register_hotkey(['f6'], lambda: self.handle_brush_preset(6))
 
         hotkey_manager.register_scroll_hotkey(['alt_l'], 'up', self.handle_scale_up)
         hotkey_manager.register_scroll_hotkey(['alt_l'], 'down', self.handle_scale_down)
 
-        hotkey_manager.register_scroll_hotkey(['shift_l'], 'up', self.handle_slope_up)
-        hotkey_manager.register_scroll_hotkey(['shift_l'], 'down', self.handle_slope_down)
+        hotkey_manager.register_scroll_hotkey(['shift'], 'up', self.handle_slope_up)
+        hotkey_manager.register_scroll_hotkey(['shift'], 'down', self.handle_slope_down)
 
         hotkey_manager.register_hotkey(['ctrl_l', 'q'], self.handle_probability_preset_decrease)
         hotkey_manager.register_hotkey(['ctrl_l', 'e'], self.handle_probability_preset_increase)
 
-    def handle_brush_preset(self):
-        print("Brush preset")
-        self.brush_preset1.click()
+        hotkey_manager.register_hotkey(['ctrl_l', 'shift', 'q'], lambda: self.handle_probability_preset_decrease(5))
+        hotkey_manager.register_hotkey(['ctrl_l', 'shift', 'e'], lambda: self.handle_probability_preset_increase(5))
+
+    def handle_brush_preset(self, idx):
+        self.preset_buttons[idx - 1].type_keys("{SPACE}")
 
     def handle_slope_up(self):
         self.slope_button.click()
@@ -55,24 +64,10 @@ class TerrainEditModule:
 
         self.scale_button.click(coords=(bottom_center_x, bottom_center_y))
 
-    def handle_probability_preset_decrease(self):
-        rect = self.probability_bar.rectangle()
-        width = rect.right - rect.left
-        height = rect.bottom - rect.top
+    def handle_probability_preset_decrease(self, impact=15):
+        print(impact)
+        self.probability_bar.type_keys(f"{{LEFT {impact}}}")
 
-        x_offset = int(width * 0.1)
-        y_offset = int(height / 2)
-
-        self.probability_bar.click(coords=(x_offset, y_offset))
-        # self.probability_bar.type_keys("{LEFT 15}", set_foreground=False)
-
-    def handle_probability_preset_increase(self):
-        rect = self.probability_bar.rectangle()
-        width = rect.right - rect.left
-        height = rect.bottom - rect.top
-
-        x_offset = int(width * 0.9)
-        y_offset = int(height / 2)
-
-        self.probability_bar.click(coords=(x_offset, y_offset))
-        # self.probability_bar.type_keys("{RIGHT 15}", coords=(start_coords, end_coords))
+    def handle_probability_preset_increase(self, impact=15):
+        print(impact)
+        self.probability_bar.type_keys(f"{{RIGHT {impact}}}")
