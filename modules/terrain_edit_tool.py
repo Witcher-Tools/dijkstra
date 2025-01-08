@@ -80,7 +80,7 @@ class TerrainEditModule:
         self.probability_bar.type_keys(f"{{RIGHT {impact}}}")
 
     def handle_horizontal_texture_mask(self):
-        self.horizontal_texture_mask.type_keys("{SPACE}")
+        self.horizontal_texture_mask.type_keys("{SPACE}", pause=None)
 
     def handle_vertical_texture_mask(self):
-        self.vertical_texture_mask.type_keys("{SPACE}")
+        self.vertical_texture_mask.type_keys("{SPACE}", pause=None)

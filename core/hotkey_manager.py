@@ -1,13 +1,21 @@
+import threading
+from collections import deque
+
 from pynput import keyboard, mouse
 
 
 class HotkeyManager:
     def __init__(self):
         self.pressed_keys = set()
+
         self.hotkey_handlers = []
         self.scroll_handlers = []
+
         self.keyboard_listener = None
         self.mouse_listener = None
+
+        self.action_queue = deque(maxlen=1)
+        self.worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
 
     def register_hotkey(self, keys, callback):
         s = frozenset(self._normalize_key(k) for k in keys)
@@ -24,22 +32,18 @@ class HotkeyManager:
 
         self.keyboard_listener.start()
         self.mouse_listener.start()
+        self.worker_thread.start()
 
         self.keyboard_listener.join()
         self.mouse_listener.join()
-
-    def stop_listening(self):
-        if self.keyboard_listener:
-            self.keyboard_listener.stop()
-        if self.mouse_listener:
-            self.mouse_listener.stop()
+        self.worker_thread.join()
 
     def _on_press(self, key):
         n = self._normalize_key(key)
         self.pressed_keys.add(n)
         for s, callback in self.hotkey_handlers:
             if s == self.pressed_keys:
-                callback()
+                self.action_queue.append(callback)
 
     def _on_release(self, key):
         n = self._normalize_key(key)
@@ -47,9 +51,15 @@ class HotkeyManager:
 
     def _on_scroll(self, x, y, dx, dy):
         d = 'up' if dy > 0 else 'down'
-        for s, sd, c in self.scroll_handlers:
+        for s, sd, callback in self.scroll_handlers:
             if s == self.pressed_keys and sd == d:
-                c()
+                self.action_queue.append(callback)
+
+    def _worker_loop(self):
+        while True:
+            if self.action_queue:
+                action = self.action_queue.popleft()
+                action()
 
     @staticmethod
     def _normalize_key(k):
