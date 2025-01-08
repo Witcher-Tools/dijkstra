@@ -16,6 +16,9 @@ class TerrainEditModule:
             ]
 
             self.probability_bar = window.child_window(class_name="msctls_trackbar32", found_index=8)
+
+            self.horizontal_texture_mask = window.child_window(title="Horizontal Texture Mask:", class_name="Button")
+            self.vertical_texture_mask = window.child_window(title="Vertical Texture Mask:", class_name="Button")
         except Exception as e:
             print(e)
 
@@ -41,6 +44,12 @@ class TerrainEditModule:
         hotkey_manager.register_hotkey(['ctrl_l', 'shift', 'q'], lambda: self.handle_probability_preset_decrease(5))
         hotkey_manager.register_hotkey(['ctrl_l', 'shift', 'e'], lambda: self.handle_probability_preset_increase(5))
 
+        hotkey_manager.register_hotkey(['ctrl_l', 'alt_l', 'q'], lambda: self.handle_probability_preset_decrease(30))
+        hotkey_manager.register_hotkey(['ctrl_l', 'alt_l', 'e'], lambda: self.handle_probability_preset_increase(30))
+
+        hotkey_manager.register_hotkey(['ctrl_l', 'v'], self.handle_vertical_texture_mask)
+        hotkey_manager.register_hotkey(['ctrl_l', 'h'], self.handle_horizontal_texture_mask)
+
     def handle_brush_preset(self, idx):
         self.preset_buttons[idx - 1].type_keys("{SPACE}")
 
@@ -65,9 +74,13 @@ class TerrainEditModule:
         self.scale_button.click(coords=(bottom_center_x, bottom_center_y))
 
     def handle_probability_preset_decrease(self, impact=15):
-        print(impact)
         self.probability_bar.type_keys(f"{{LEFT {impact}}}")
 
     def handle_probability_preset_increase(self, impact=15):
-        print(impact)
         self.probability_bar.type_keys(f"{{RIGHT {impact}}}")
+
+    def handle_horizontal_texture_mask(self):
+        self.horizontal_texture_mask.type_keys("{SPACE}")
+
+    def handle_vertical_texture_mask(self):
+        self.vertical_texture_mask.type_keys("{SPACE}")

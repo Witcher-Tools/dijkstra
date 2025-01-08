@@ -38,7 +38,6 @@ class HotkeyManager:
         n = self._normalize_key(key)
         self.pressed_keys.add(n)
         for s, callback in self.hotkey_handlers:
-            print(self.pressed_keys, s)
             if s == self.pressed_keys:
                 callback()
 
