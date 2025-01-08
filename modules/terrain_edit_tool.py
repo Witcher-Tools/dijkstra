@@ -1,11 +1,6 @@
-from pywinauto import Application
-from pynput import keyboard
-
-
 class TerrainEditModule:
-    def __init__(self):
+    def __init__(self, app, hotkey_manager):
         try:
-            app = Application().connect(title_re=".*REDkit.*")
             window = app.window(title="Terrain Edit Tools")
 
             self.scale_button = window.child_window(class_name="msctls_updown32", index=0)
@@ -20,23 +15,35 @@ class TerrainEditModule:
         except Exception as e:
             print(e)
 
+        self.register_hotkeys(hotkey_manager)
+
     def register_hotkeys(self, hotkey_manager):
-        hotkey_manager.register_hotkey([keyboard.Key.shift_l, "scroll"], self.handle_slope_scroll)
-        hotkey_manager.register_hotkey([keyboard.Key.alt_l, "scroll"], self.handle_scale_scroll)
-        hotkey_manager.register_hotkey([keyboard.Key.f1], self.handle_brush_preset)
-        hotkey_manager.register_hotkey([keyboard.Key.f2], self.handle_brush_preset2)
+        hotkey_manager.register_hotkey(['f1'], self.handle_brush_preset)
+
+        hotkey_manager.register_scroll_hotkey(['alt_l'], 'up', self.handle_scale_up)
+        hotkey_manager.register_scroll_hotkey(['alt_l'], 'down', self.handle_scale_down)
+
+        hotkey_manager.register_scroll_hotkey(['ctrl_l'], 'up', self.handle_slope_up)
+        hotkey_manager.register_scroll_hotkey(['ctrl_l'], 'down', self.handle_slope_down)
+
+        pass
 
     def handle_brush_preset(self):
-        # self.brushPreset1.click()
+        self.brushPreset1.click()
         print("Brush preset")
 
-    def handle_brush_preset2(self):
-        # self.brushPreset2.set_keyboard_focus()
-        # self.brushPreset2.type_keys("{SPACE}", set_foreground=False)
-        print("Brush preset 2")
+    def handle_slope_up(self):
+        self.slope_button.click()
+        print("Slope up")
 
-    def handle_scale_scroll(self, dy):
-        print("Scrolling scale", dy)
+    def handle_slope_down(self):
+        self.slope_button.click(coords=(5, 5))
+        print("Slope down")
 
-    def handle_slope_scroll(self, dy):
-        print("Scrolling slope", dy)
+    def handle_scale_up(self):
+        self.scale_button.click()
+        print("Scale up")
+
+    def handle_scale_down(self):
+        self.scale_button.click(coords=(5, 5))
+        print("Scale down")
