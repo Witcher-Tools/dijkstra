@@ -1,5 +1,5 @@
 import threading
-from collections import deque
+import queue
 
 from pynput import keyboard, mouse
 
@@ -7,24 +7,24 @@ from pynput import keyboard, mouse
 class HotkeyManager:
     def __init__(self):
         self.pressed_keys = set()
-
         self.hotkey_handlers = []
         self.scroll_handlers = []
-
         self.keyboard_listener = None
         self.mouse_listener = None
 
-        self.action_queue = deque(maxlen=1)
+        self.action_queue = queue.Queue(maxsize=2)
+
         self.worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
+        self.worker_thread.start()
 
     def register_hotkey(self, keys, callback):
-        s = frozenset(self._normalize_key(k) for k in keys)
-        self.hotkey_handlers.append((s, callback))
+        combo = frozenset(self._normalize_key(k) for k in keys)
+        self.hotkey_handlers.append((combo, callback))
 
     def register_scroll_hotkey(self, keys, direction, callback):
-        s = frozenset(self._normalize_key(k) for k in keys)
+        combo = frozenset(self._normalize_key(k) for k in keys)
         d = direction.lower()
-        self.scroll_handlers.append((s, d, callback))
+        self.scroll_handlers.append((combo, d, callback))
 
     def start_listening(self):
         self.keyboard_listener = keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
@@ -32,39 +32,48 @@ class HotkeyManager:
 
         self.keyboard_listener.start()
         self.mouse_listener.start()
-        self.worker_thread.start()
 
         self.keyboard_listener.join()
         self.mouse_listener.join()
+
+        self.action_queue.put(None)
+
         self.worker_thread.join()
 
     def _on_press(self, key):
-        n = self._normalize_key(key)
-        self.pressed_keys.add(n)
-        for s, callback in self.hotkey_handlers:
-            if s == self.pressed_keys:
-                self.action_queue.append(callback)
+        norm = self._normalize_key(key)
+        self.pressed_keys.add(norm)
+        for combo, callback in self.hotkey_handlers:
+            if combo == self.pressed_keys:
+                if not self.action_queue.full():
+                    self.action_queue.put(callback)
 
     def _on_release(self, key):
-        n = self._normalize_key(key)
-        self.pressed_keys.discard(n)
+        norm = self._normalize_key(key)
+        self.pressed_keys.discard(norm)
 
     def _on_scroll(self, x, y, dx, dy):
-        d = 'up' if dy > 0 else 'down'
-        for s, sd, callback in self.scroll_handlers:
-            if s == self.pressed_keys and sd == d:
-                self.action_queue.append(callback)
+        direction = 'up' if dy > 0 else 'down'
+        for combo, scroll_dir, callback in self.scroll_handlers:
+            if combo == self.pressed_keys and scroll_dir == direction:
+                if not self.action_queue.full():
+                    self.action_queue.put(callback)
 
     def _worker_loop(self):
         while True:
-            if self.action_queue:
-                action = self.action_queue.popleft()
-                action()
+            try:
+                task = self.action_queue.get()
+            except queue.Empty:
+                continue
+            if task is None:
+                break
+            task()
+            self.action_queue.task_done()
 
     @staticmethod
     def _normalize_key(k):
         if isinstance(k, keyboard.Key):
-            return k.name.lower()
+            return (k.name or '').lower()
         if isinstance(k, keyboard.KeyCode):
             if k.char is not None:
                 if 1 <= ord(k.char) <= 26:
@@ -76,5 +85,4 @@ class HotkeyManager:
                 if 97 <= k.vk <= 122:
                     return chr(k.vk)
                 return str(k.vk)
-
         return str(k).lower()
