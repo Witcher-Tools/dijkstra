@@ -14,8 +14,11 @@ class VegetationEditModule:
                     except Exception:
                         pass
 
+            print(self.buttons)
+
         except Exception as e:
             print(e)
+            pass
 
         self.register_hotkeys(hotkey_manager)
 
@@ -24,6 +27,5 @@ class VegetationEditModule:
             hotkey_manager.register_hotkey([str(i)], lambda x=i: self.handle_preset(x))
 
     def handle_preset(self, idx):
-        print(f"Vegetation preset {idx}")
         if 0 <= idx < len(self.buttons):
             self.buttons[idx-1].click()

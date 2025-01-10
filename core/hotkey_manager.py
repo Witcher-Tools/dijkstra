@@ -7,8 +7,10 @@ from pynput import keyboard, mouse
 class HotkeyManager:
     def __init__(self):
         self.pressed_keys = set()
+
         self.hotkey_handlers = []
         self.scroll_handlers = []
+
         self.keyboard_listener = None
         self.mouse_listener = None
 

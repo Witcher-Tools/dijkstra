@@ -19,8 +19,8 @@ class TerrainEditModule:
 
             self.horizontal_texture_mask = window.child_window(title="Horizontal Texture Mask:", class_name="Button")
             self.vertical_texture_mask = window.child_window(title="Vertical Texture Mask:", class_name="Button")
-        except Exception as e:
-            print(e)
+        except Exception:
+            pass
 
         self.register_hotkeys(hotkey_manager)
 
