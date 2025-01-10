@@ -1,3 +1,5 @@
+import sys
+
 from pywinauto import Application
 from PIL import Image
 
@@ -7,13 +9,17 @@ from core.hotkey_manager import HotkeyManager
 from modules.terrain_edit_tool import TerrainEditModule
 from modules.vegetation_edit_tool import VegetationEditModule
 
+m = HotkeyManager()
+
 
 def on_clicked_toggle_autorun(tray, item):
     pass
 
 
 def on_clicked_exit(tray, item):
+    m.stop_listening()
     tray.stop()
+    sys.exit(0)
 
 
 def setup_tray_icon():
@@ -29,7 +35,6 @@ def setup_tray_icon():
 
 
 def main():
-    m = HotkeyManager()
     a = Application().connect(title_re=".*REDkit.*")
 
     TerrainEditModule(a, m)

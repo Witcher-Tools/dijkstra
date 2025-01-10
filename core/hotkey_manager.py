@@ -40,6 +40,10 @@ class HotkeyManager:
 
         self.worker_thread.join()
 
+    def stop_listening(self):
+        self.keyboard_listener.stop()
+        self.mouse_listener.stop()
+
     def _on_press(self, key):
         norm = self._normalize_key(key)
         self.pressed_keys.add(norm)
