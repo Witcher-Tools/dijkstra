@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
+    pathex=['vendor', 'vendor'],
     binaries=[],
     datas=[('resources/icons', 'resources/icons')],
     hiddenimports=[],

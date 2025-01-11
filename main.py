@@ -7,9 +7,8 @@ import win32api
 import win32event
 import winerror
 
-parent_dir = os.path.abspath(os.path.dirname(__file__))
-vendor_dir = os.path.join(parent_dir, 'vendor')
-sys.path.append(vendor_dir)
+vendor_path = os.path.join(os.path.dirname(__file__), "vendor")
+sys.path.insert(0, vendor_path)
 
 mutex_name = "Global\\DijkstraUniqueMutexName"
 mutex = win32event.CreateMutex(None, False, mutex_name)
