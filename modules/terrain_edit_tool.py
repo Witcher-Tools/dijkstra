@@ -27,10 +27,9 @@ class TerrainEditModule:
     def register_hotkeys(self, hotkey_manager):
         hotkey_manager.register_hotkey(['f1'], lambda: self.handle_brush_preset(1))
         hotkey_manager.register_hotkey(['f2'], lambda: self.handle_brush_preset(2))
-        hotkey_manager.register_hotkey(['f3'], lambda: self.handle_brush_preset(3))
-        hotkey_manager.register_hotkey(['f4'], lambda: self.handle_brush_preset(4))
-        hotkey_manager.register_hotkey(['f5'], lambda: self.handle_brush_preset(5))
-        hotkey_manager.register_hotkey(['f6'], lambda: self.handle_brush_preset(6))
+        hotkey_manager.register_hotkey(['f5'], lambda: self.handle_brush_preset(3))
+        hotkey_manager.register_hotkey(['f6'], lambda: self.handle_brush_preset(4))
+        hotkey_manager.register_hotkey(['f7'], lambda: self.handle_brush_preset(5))
 
         hotkey_manager.register_scroll_hotkey(['alt_l'], 'up', self.handle_scale_up)
         hotkey_manager.register_scroll_hotkey(['alt_l'], 'down', self.handle_scale_down)

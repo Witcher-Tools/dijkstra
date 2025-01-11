@@ -1,6 +1,9 @@
 import threading
 import queue
 
+import psutil
+import win32gui
+import win32process
 from pynput import keyboard, mouse
 
 
@@ -47,6 +50,9 @@ class HotkeyManager:
         self.mouse_listener.stop()
 
     def _on_press(self, key):
+        if not self._is_editor_foreground():
+            return
+
         norm = self._normalize_key(key)
         self.pressed_keys.add(norm)
         for combo, callback in self.hotkey_handlers:
@@ -69,12 +75,24 @@ class HotkeyManager:
         while True:
             try:
                 task = self.action_queue.get()
+                if task is None:
+                    break
+                task()
             except queue.Empty:
                 continue
-            if task is None:
-                break
-            task()
+            except Exception:
+                continue
             self.action_queue.task_done()
+
+    @staticmethod
+    def _is_editor_foreground(target_exe_name="editor.exe"):
+        try:
+            fg_window = win32gui.GetForegroundWindow()
+            _, pid = win32process.GetWindowThreadProcessId(fg_window)
+            process = psutil.Process(pid)
+            return process.name().lower() == target_exe_name.lower()
+        except Exception:
+            return False
 
     @staticmethod
     def _normalize_key(k):
@@ -86,6 +104,8 @@ class HotkeyManager:
                     return chr(ord('a') + (ord(k.char) - 1))
                 return k.char.lower()
             if k.vk is not None:
+                if 0x60 <= k.vk <= 0x69:
+                    return f"numpad{chr(k.vk - 0x60 + ord('0'))}"
                 if 65 <= k.vk <= 90:
                     return chr(k.vk + 32)
                 if 97 <= k.vk <= 122:

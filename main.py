@@ -6,13 +6,15 @@ from threading import Thread
 import win32api
 import win32event
 import winerror
-from PIL import Image
+
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+vendor_dir = os.path.join(parent_dir, 'vendor')
+sys.path.append(vendor_dir)
 
 mutex_name = "Global\\DijkstraUniqueMutexName"
 mutex = win32event.CreateMutex(None, False, mutex_name)
 
 if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
-    print("Another instance of the application is already running. Exiting.")
     sys.exit(0)
 
 tray = None
@@ -95,12 +97,10 @@ def app_loop():
         is_running = redkit_running()
 
         if is_running and not editor_connected:
+            from pywinauto import Application
             try:
-                from pywinauto import Application
-
-                run_app(Application().connect(title_re=".*REDkit.*"))
+                run_app(Application().connect(title_re=".*The Witcher 3 REDkit.*"))
             except Exception as e:
-                print(e)
                 pass
         elif not is_running and editor_connected:
             stop_app()
@@ -119,7 +119,6 @@ def resource_path(relative_path):
 
 def main():
     Thread(target=app_loop, daemon=True).start()
-    icon = Image.open(resource_path(r"resources/icons/dijkstra.ico"))
 
     while running:
         sleep(5)

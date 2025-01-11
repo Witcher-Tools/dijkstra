@@ -16,10 +16,12 @@ Name: "{userdesktop}\Dijkstra"; Filename: "{app}\Dijkstra.exe"; Tasks: desktopic
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
-    ValueType: string; ValueName: "DijkstraAutorun"; ValueData: """{app}\Dijkstra.exe"""; Flags: uninsdeletevalue
+    ValueType: string; ValueName: "DijkstraAutorun"; \
+    ValueData: """{app}\Dijkstra.exe"""; Flags: uninsdeletevalue; Tasks: autorun
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "autorun"; Description: "Add Dijkstra to startup (Autorun)"; GroupDescription: "Startup Options"; Flags: checked
 
 [Run]
 Filename: "{app}\Dijkstra.exe"; Description: "{cm:LaunchProgram,Dijkstra}"; Flags: nowait postinstall skipifsilent

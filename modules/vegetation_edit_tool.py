@@ -2,22 +2,18 @@ class VegetationEditModule:
     def __init__(self, app, hotkey_manager):
         try:
             window = app.window(title="Vegetation Edit Tool")
-            panel = window.child_window(title="panel", class_name="wxWindowNR", found_index=0)
 
             self.buttons = []
 
-            for children in panel.children():
-                if children.window_text() != '' and children.window_text() != 'm_brushDescPanel':
-                    try:
-                        button = window.child_window(title=children.window_text(), class_name="Static")
-                        self.buttons.append(button)
-                    except Exception:
-                        pass
-
-            print(self.buttons)
-
-        except Exception as e:
-            print(e)
+            self.buttons = [
+                window.child_window(class_name="Static", found_index=3),
+                window.child_window(class_name="Static", found_index=4),
+                window.child_window(class_name="Static", found_index=5),
+                window.child_window(class_name="Static", found_index=6),
+                window.child_window(class_name="Static", found_index=7),
+                window.child_window(class_name="Static", found_index=8)
+            ]
+        except Exception:
             pass
 
         self.register_hotkeys(hotkey_manager)
@@ -27,5 +23,5 @@ class VegetationEditModule:
             hotkey_manager.register_hotkey([str(i)], lambda x=i: self.handle_preset(x))
 
     def handle_preset(self, idx):
-        if 0 <= idx < len(self.buttons):
+        if 0 <= idx - 1 < len(self.buttons):
             self.buttons[idx-1].click()
