@@ -28,7 +28,7 @@ def create_tray():
     from PIL import Image
     from pystray import MenuItem, Icon, Menu
 
-    icon = Image.open(resource_path(r"resources/dijkstra.ico"))
+    icon = Image.open(resource_path(r"resources/icons/dijkstra.ico"))
 
     menu = Menu(
         MenuItem("Exit", exit_app)
@@ -116,9 +116,10 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+
 def main():
     Thread(target=app_loop, daemon=True).start()
-    icon = Image.open(resource_path(r"resources/dijkstra.ico"))
+    icon = Image.open(resource_path(r"resources/icons/dijkstra.ico"))
 
     while running:
         sleep(5)
