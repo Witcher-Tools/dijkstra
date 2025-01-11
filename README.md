@@ -37,7 +37,8 @@ After installation, the Dijkstra Hotkey Extender can optionally set itself to ru
 ---
 
 ## Build
-You can change hotkeys or add new by changing ```register_hotkeys``` functions in modules folder.
+You can change hotkeys or add new by changing ```register_hotkeys``` functions in modules folder.  
+Parsed layout is in `data` folder.
 
 Then you can build it with pyinstaller.
 ```
